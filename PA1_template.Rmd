@@ -1,6 +1,5 @@
----
-title: "Reproducible Research: Peer Assessment 1"
----
+Reproducible Research: Peer Assessment 1
+====================================================
 Created by Brandon Hu on May 17, 2015
 
 ## Basic Configurtions 
@@ -112,6 +111,24 @@ From the above results, the following conclusion is drawn:
 There is no impact to imputing missing data on mean value as the old mean equates to the new mean. However, the new median of total daily number of steps is greater than the old median.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+* Create a new factor variable in the datasets with 2 levels to indicate either is weekday or weekend
 ```{r}
+newData$day <- factor(format(newData$date, "%A")) #format into full weekday name in the current locale
+levels(newData$day) <- list(weekday = c("Monday", "Tuesday",
+                                             "Wednesday", 
+                                             "Thursday", "Friday"),
+                                 weekend = c("Saturday", "Sunday")) #replace the 'day' column into weekday and weekend instead of showing e.g. Monday.
+levels(newData$day)
 ```
 
+* Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis)
+```{r}
+avgSteps <- aggregate(newData$steps, list(interval = newData$interval, days = newData$day), FUN = "mean")
+#avg steps and assign to a variable
+names(avgSteps)[3] <- "average_steps" #rename the colname x to average_steps
+library(lattice) #to plot the panel plot
+xyplot(avgSteps$average_steps ~ avgSteps$interval | avgSteps$days, 
+       layout = c(1, 2), type = "l", 
+       xlab = "Interval", ylab = "Number of steps")
+```
